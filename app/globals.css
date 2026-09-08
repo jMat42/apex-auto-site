@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Palette -------------------------------------------------------
+     Colour carries meaning on this site. Keep it that way:
+       signal = ApexAutoFlow / the operator acting
+       cool   = the customer, inbound
+       alert  (red) = the missed call, the lost job
+     Never use them decoratively.
+
+     These are the AMBER defaults. The blue variant overrides signal and
+     cool below - see `html[data-theme="blue"]`.                         */
+  --color-void: #08090b;
+  --color-panel: #101317;
+  --color-panel-2: #161a20;
+  --color-line: #1e242c;
+  --color-line-bright: #2b333e;
+  --color-text: #f2f4f7;
+  --color-muted: #8a94a2;
+  --color-dim: #5c6673;
+  --color-signal: #ffb020;
+  --color-signal-soft: #ffc95c;
+  --color-signal-dim: #7a5410;
+  --color-cool: #4da3ff;
+  --color-alert: #ff5c4d;
+
+  --font-display: var(--font-archivo), "Arial Black", system-ui, sans-serif;
+  --font-body: var(--font-public-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --radius-console: 1rem;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Channel-only mirror of the signal hue. Needed by the handful of raw rgb()
+   shadows and washes whose alpha Tailwind can't express as a utility; keep it
+   in sync with --color-signal in every theme. */
+:root {
+  --signal-rgb: 255 176 32;
+}
+
+/* ---- Blue variant ---------------------------------------------------
+   The same system with a sky-blue signal instead of amber. Switch by
+   flipping `data-theme` on <html> in app/layout.tsx.
+
+   `cool` moves off blue here: signal and cool sit opposite each other in
+   the call thread (us vs. the customer), and two blues at 10% fill on a
+   near-black panel read as one colour. Violet keeps that distinction.   */
+html[data-theme="blue"] {
+  --color-signal: #8dbef0;
+  --color-signal-soft: #b6d6f7;
+  --color-signal-dim: #2f4a68;
+  --color-cool: #9b8cff;
+  --signal-rgb: 141 190 240;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    /* Native controls - checkboxes, the select popup, scrollbars - follow the
+       page instead of rendering as bright white boxes on the dark canvas. */
+    color-scheme: dark;
+    /* `clip`, not `hidden`: entry animations start a few px outside the right
+       edge and ambient blooms are wider than a phone, but `overflow: hidden`
+       would turn this into a scroll container and break every position:sticky
+       on the page. */
+    overflow-x: clip;
+  }
+
+  body {
+    background: var(--color-void);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    font-feature-settings: "ss01";
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-void);
+  }
+
+  /* `html` prefix + explicit longhands: a bare `:focus-visible` shorthand in
+     this layer loses its colour to Tailwind's outline utilities, which set
+     outline-style/width from the utilities layer. */
+  html :focus-visible {
+    outline-style: solid;
+    outline-width: 2px;
+    outline-color: var(--color-signal);
+    outline-offset: 3px;
+  }
+
+  /* Tabular figures everywhere numbers are read as data, not prose. */
+  .font-mono,
+  [class*="font-mono"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero" 1;
+  }
+}
+
+@layer components {
+  /* Display type: Archivo pushed wide. Reads like equipment badging and
+     fleet-vehicle lettering rather than a generic SaaS grotesque. */
+  .display {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 116;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .display-tight {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 108;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+
+  /* Section eyebrow — a call-log label, not decoration. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-signal);
+  }
+
+  .rule {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-line-bright),
+      var(--color-line) 40%,
+      transparent
+    );
+  }
+
+  .console {
+    background: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-console);
+  }
+
+  /* Corner ticks — the console frame motif, used sparingly. Arcs rather than
+     right angles now, so they trace the card's own curve. */
+  .ticks::before,
+  .ticks::after {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: var(--color-signal);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .ticks::before {
+    top: 0;
+    left: 0;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-top-left-radius: var(--radius-console);
+  }
+  .ticks::after {
+    bottom: 0;
+    right: 0;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    border-bottom-right-radius: var(--radius-console);
+  }
+
+  .glow-signal {
+    box-shadow:
+      0 0 0 1px rgb(var(--signal-rgb) / 0.25),
+      0 8px 40px -8px rgb(var(--signal-rgb) / 0.35);
+  }
+}
+
+@layer utilities {
+  .shell {
+    width: 100%;
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 1280px) {
+    /* Room for the fixed Live Line rail. */
+    .shell {
+      padding-left: 4rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Anything animated must have a still, complete resting state. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Legal pages. The text is compliance copy and is transcribed verbatim; only
+   its presentation lives here.
+   --------------------------------------------------------------------------- */
+@layer components {
+  .legal h2 {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 108;
+    font-weight: 700;
+    font-size: 1.1875rem;
+    letter-spacing: -0.01em;
+    color: var(--color-text);
+    margin-top: 2.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .legal p {
+    margin-top: 1rem;
+    color: var(--color-muted);
+    line-height: 1.75;
+  }
+
+  .legal ul {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .legal li {
+    position: relative;
+    padding-left: 1.25rem;
+    color: var(--color-muted);
+    line-height: 1.7;
+  }
+
+  .legal li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 5px;
+    height: 5px;
+    background: var(--color-signal);
+  }
+
+  .legal strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .legal a {
+    color: var(--color-signal);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .legal a:hover {
+    color: var(--color-signal-soft);
+  }
+
+  .legal .callout {
+    margin-top: 1.5rem;
+    border-radius: 0 0.75rem 0.75rem 0;
+    border-left: 2px solid var(--color-signal);
+    background: rgb(var(--signal-rgb) / 0.05);
+    padding: 1.125rem 1.25rem;
+  }
+
+  .legal .callout p:first-child {
+    margin-top: 0;
+  }
+
+  .legal .kw {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--color-signal);
+    letter-spacing: 0.06em;
+  }
+}
