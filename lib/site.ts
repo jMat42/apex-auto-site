@@ -1,0 +1,47 @@
+/**
+ * Site-wide constants. Anything the client might want changed without a code
+ * review lives here or in lib/content.ts.
+ */
+
+export const site = {
+  name: "ApexAutoFlow",
+  legalEntity: "SOPS Finance & Accounting LLC",
+  url: "https://apexautoflow.netlify.app",
+  contactEmail: "partner.apexautoflow@gmail.com",
+  adminEmail: "admin.apexautoflow@gmail.com",
+  region: "Colorado",
+} as const;
+
+/**
+ * BACKEND SEAM (scheduling).
+ *
+ * Empty string = every "Book a free call" CTA scrolls to the on-page form.
+ * Drop in a Calendly / Cal.com / SavvyCal link and the exact same CTAs route
+ * there instead. No component changes required — see components/ui/Cta.tsx.
+ */
+export const BOOKING_URL = "";
+
+export const nav = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "What you get", href: "#what-you-get" },
+  { label: "Why us", href: "#why-us" },
+  { label: "Pricing", href: "#pricing" },
+] as const;
+
+/**
+ * The Live Line: the arc of one recovered job, from the ring to getting paid.
+ * Each node maps to a section id, in document order. Timestamps are elapsed
+ * call/job time — they are real information about the sequence, not chrome.
+ */
+export const timeline = [
+  { id: "top", time: "00:00", label: "Ring" },
+  { id: "problem", time: "00:18", label: "No answer" },
+  { id: "how-it-works", time: "00:22", label: "Text sent" },
+  { id: "what-you-get", time: "01:05", label: "Reply" },
+  { id: "why-us", time: "01:11", label: "Ranked" },
+  { id: "pricing", time: "01:26", label: "Booked" },
+  { id: "faq", time: "02:41", label: "On site" },
+  { id: "get-started", time: "——:——", label: "Paid" },
+] as const;
+
+export type TimelineNode = (typeof timeline)[number];
