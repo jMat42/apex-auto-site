@@ -5,7 +5,7 @@
   // There is no Worker script: `assets` alone serves `out/` from Cloudflare's
   // edge. Do NOT reach for @opennextjs/cloudflare here; that adapter exists to
   // run *server-rendered* Next.js and does not support static export.
-  "name": "apex-auto-flow-site",
+  "name": "apex-auto-site",
   "compatibility_date": "2026-09-10",
 
   "assets": {
