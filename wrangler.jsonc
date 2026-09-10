@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // This site is `output: "export"` (see next.config.ts) — pure static HTML.
+  // There is no Worker script: `assets` alone serves `out/` from Cloudflare's
+  // edge. Do NOT reach for @opennextjs/cloudflare here; that adapter exists to
+  // run *server-rendered* Next.js and does not support static export.
+  "name": "apex-auto-flow-site",
+  "compatibility_date": "2026-09-10",
+
+  "assets": {
+    "directory": "./out",
+
+    // next.config.ts sets `trailingSlash: true`, so the export emits
+    // `out/privacy/index.html`. Forcing the slash keeps one canonical URL
+    // per page instead of serving both /privacy and /privacy/.
+    "html_handling": "force-trailing-slash",
+
+    // `next build` emits out/404.html for unmatched routes.
+    "not_found_handling": "404-page"
+  }
+}
